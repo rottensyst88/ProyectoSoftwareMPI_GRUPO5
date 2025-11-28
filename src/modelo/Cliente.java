@@ -4,11 +4,13 @@ public class Cliente {
     private String rut;
     private String domicilio;
     private String nombreCompleto;
+    private Contrato contratoCliente;
 
-    public Cliente(String rut, String domicilio, String nombreCompleto) {
+    public Cliente(String nombreCompleto, String rut, String domicilio) {
         this.rut = rut;
         this.domicilio = domicilio;
         this.nombreCompleto = nombreCompleto;
+        contratoCliente = null;
     }
 
     public String getRut() {

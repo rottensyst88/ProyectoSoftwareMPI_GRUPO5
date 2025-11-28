@@ -1,6 +1,6 @@
-package modelo;
+package modelo.cuentas;
 
-public class Cuenta {
+public abstract class Cuenta {
 
     private long idCuenta;
     private double saldo;
