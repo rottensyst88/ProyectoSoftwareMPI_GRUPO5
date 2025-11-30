@@ -1,5 +1,7 @@
 package vista;
 
+import excepcion.BancoException;
+
 import javax.swing.*;
 import java.awt.event.*;
 
@@ -56,12 +58,28 @@ public class VentanaPrincipal extends JDialog {
         });
         crearContratoButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                VincularContrato.main(null);
+
+                try {
+                    VincularContrato.main(null);
+                }catch (BancoException e1){
+                    JOptionPane.showMessageDialog(null,
+                            e1.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         firmarContratoButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                FirmarContrato.main(null);
+                try{
+                    FirmarContrato.main(null);
+                } catch (BancoException e1) {
+                    JOptionPane.showMessageDialog(null,
+                            e1.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
             }
         });
     }
@@ -73,12 +91,11 @@ public class VentanaPrincipal extends JDialog {
     private void acercaDe(){
         JOptionPane.showMessageDialog(this,
                 "Sistema Bancario v1.0\n" +
-                        "Sistema de prueba, Versión de compilación 28NOV2025\n",
+                        "Sistema de prueba, Versión de compilación 29NOV2025\n",
                 "Acerca de",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /*
     public static void main(String[] args) {
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -100,8 +117,9 @@ public class VentanaPrincipal extends JDialog {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-    }*/
+    }
 
+    /*
     public static void main(String[] args) {
         try {
             // Establece el Look and Feel de Motif
@@ -113,5 +131,5 @@ public class VentanaPrincipal extends JDialog {
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
-    }
+    }*/
 }
