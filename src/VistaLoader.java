@@ -1,5 +1,7 @@
 import vista.VentanaPrincipal;
 
-void main() {
-    VentanaPrincipal.main(null);
+public class VistaLoader {
+    public static void main(String[] args) {
+        VentanaPrincipal.main(null);
+    }
 }
