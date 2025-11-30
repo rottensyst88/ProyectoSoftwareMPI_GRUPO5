@@ -2,6 +2,7 @@ package vista;
 
 import javax.naming.ldap.Control;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import controlador.ControladorSistema;
 import excepcion.BancoException;
@@ -56,27 +57,49 @@ public class CrearCliente extends JDialog {
         try {
             ControladorSistema.getInstancia().crearCliente(nombre, rut, domicilio);
             JOptionPane.showMessageDialog(this,
-                    "Cliente creado exitosamente",
+                    "Cliente creado exitosamente. Su clave se le será entregada a continuación. Debe copiarla con el comando CTRL+C y guardarla en un lugar seguro.",
                     "Crear Cliente",
                     JOptionPane.INFORMATION_MESSAGE);
+
+            createAndShowGUI(rut);
+
         } catch (BancoException e) {
             JOptionPane.showMessageDialog(this,
                     "Error al crear cliente: " + e.getMessage(),
                     "Crear Cliente",
                     JOptionPane.ERROR_MESSAGE);
         }
-
         dispose();
     }
 
     private void onCancel() {
-        // add your code here if necessary
         dispose();
     }
 
     public static void main(String[] args) {
         CrearCliente dialog = new CrearCliente();
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    private void createAndShowGUI(String rut) {
+        String longText = "Tiene que copiar la siguiente cadena de texto: " + ControladorSistema.getInstancia().obtenerClaveCliente(rut);
+
+        JTextArea textArea = new JTextArea(5, 30);
+        textArea.setText(longText);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+        JOptionPane optionPane = new JOptionPane(panel, JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = optionPane.createDialog(this, "Contraseña de usuario");
+        dialog.setModal(true);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+        dialog.dispose();
     }
 }

@@ -11,6 +11,7 @@ public class VentanaPrincipal extends JDialog {
     private JButton crearContratoButton;
     private JButton crearCuentaClienteButton;
     private JButton listarClientesButton;
+    private JButton firmarContratoButton;
 
     public VentanaPrincipal() {
         setContentPane(contentPane);
@@ -53,6 +54,16 @@ public class VentanaPrincipal extends JDialog {
                 ListarClientes.main(null);
             }
         });
+        crearContratoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                VincularContrato.main(null);
+            }
+        });
+        firmarContratoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FirmarContrato.main(null);
+            }
+        });
     }
 
     private void onOK() {
@@ -67,6 +78,7 @@ public class VentanaPrincipal extends JDialog {
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /*
     public static void main(String[] args) {
         try {
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -78,7 +90,7 @@ public class VentanaPrincipal extends JDialog {
         } catch (Exception e) {
             // Si Nimbus no está disponible, puedes establecer un valor predeterminado
             try {
-                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -86,7 +98,20 @@ public class VentanaPrincipal extends JDialog {
 
         VentanaPrincipal dialog = new VentanaPrincipal();
         dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
+    }*/
+
+    public static void main(String[] args) {
+        try {
+            // Establece el Look and Feel de Motif
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        VentanaPrincipal dialog = new VentanaPrincipal();
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
-
 }
