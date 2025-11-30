@@ -3,6 +3,7 @@ package vista;
 import excepcion.BancoException;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class VentanaPrincipal extends JDialog {
@@ -14,10 +15,15 @@ public class VentanaPrincipal extends JDialog {
     private JButton crearCuentaClienteButton;
     private JButton listarClientesButton;
     private JButton firmarContratoButton;
+    private JPanel panelFoto;
+    private JLabel foto;
+    private JPanel botones;
 
     public VentanaPrincipal() {
+
         setContentPane(contentPane);
         setModal(true);
+        cargarFoto();
         getRootPane().setDefaultButton(salirButton);
 
         salirButton.addActionListener(new ActionListener() {
@@ -114,6 +120,9 @@ public class VentanaPrincipal extends JDialog {
         }
 
         VentanaPrincipal dialog = new VentanaPrincipal();
+        dialog.setTitle("Administración de Sistema Bancario");
+        dialog.setSize(800,500);
+        dialog.setResizable(false);
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -132,4 +141,22 @@ public class VentanaPrincipal extends JDialog {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }*/
+
+    private void cargarFoto() {
+        try {
+            // Ruta de la imagen (ajusta según tu proyecto)
+            ImageIcon imagenOriginal = new ImageIcon(getClass().getResource("/graficos/banner_BancoEstado.png"));
+
+            // Redimensionar la imagen
+            int ancho = 289;  // Ajusta estos valores según necesites
+            int alto = 55;
+            Image imagenRedimensionada = imagenOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+
+            // Asignar la imagen redimensionada al JLabel
+            foto.setIcon(new ImageIcon(imagenRedimensionada));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

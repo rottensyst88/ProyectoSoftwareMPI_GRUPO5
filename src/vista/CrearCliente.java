@@ -14,11 +14,13 @@ public class CrearCliente extends JDialog {
     private JTextField nombreField;
     private JTextField rutField;
     private JTextField domicilioField;
+    private JLabel foto;
 
     public CrearCliente() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(aceptarButton);
+        cargarFoto();
 
         aceptarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -78,6 +80,8 @@ public class CrearCliente extends JDialog {
 
     public static void main(String[] args) {
         CrearCliente dialog = new CrearCliente();
+        dialog.setResizable(false);
+        dialog.setTitle("Crear Cliente");
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -102,4 +106,22 @@ public class CrearCliente extends JDialog {
         dialog.setVisible(true);
         dialog.dispose();
     }
+
+    private void cargarFoto() {
+        try {
+            // Ruta de la imagen (ajusta según tu proyecto)
+            ImageIcon imagenOriginal = new ImageIcon(getClass().getResource("/graficos/crearCliente.png"));
+
+            // Redimensionar la imagen
+            int ancho = 295;  // Ajusta estos valores según necesites
+            int alto = 56;
+            Image imagenRedimensionada = imagenOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+
+            // Asignar la imagen redimensionada al JLabel
+            foto.setIcon(new ImageIcon(imagenRedimensionada));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
