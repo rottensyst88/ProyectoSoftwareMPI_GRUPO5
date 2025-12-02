@@ -56,6 +56,15 @@ public class CrearCliente extends JDialog {
         String rut = rutField.getText();
         String domicilio = domicilioField.getText();
 
+
+        if(nombre.isEmpty() || rut.isEmpty() || domicilio.isEmpty()){
+            JOptionPane.showMessageDialog(this,
+                    "Todos los campos son obligatorios.",
+                    "Crear Cliente",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
             ControladorSistema.getInstancia().crearCliente(nombre, rut, domicilio);
             JOptionPane.showMessageDialog(this,
