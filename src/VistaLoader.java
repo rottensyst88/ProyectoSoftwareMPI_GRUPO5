@@ -1,8 +1,7 @@
-import vista.Vista;
+import vista.VentanaPrincipal;
 
 public class VistaLoader {
     public static void main(String[] args) {
-        Vista vista = Vista.getInstancia();
-        vista.menu();
+        VentanaPrincipal.main(null);
     }
 }

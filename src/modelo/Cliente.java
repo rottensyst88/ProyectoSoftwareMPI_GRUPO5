@@ -1,14 +1,27 @@
 package modelo;
 
+import excepcion.BancoException;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
 public class Cliente {
     private String rut;
     private String domicilio;
     private String nombreCompleto;
+    private ArrayList<Contrato> contratos;
+    private String clavePersonal;
 
-    public Cliente(String rut, String domicilio, String nombreCompleto) {
+    public Cliente(String nombreCompleto, String rut, String domicilio) {
         this.rut = rut;
         this.domicilio = domicilio;
         this.nombreCompleto = nombreCompleto;
+        this.contratos = new ArrayList<>();
+        this.clavePersonal = getRandomString();
+    }
+
+    public String getClavePersonal() {
+        return clavePersonal;
     }
 
     public String getRut() {
@@ -35,14 +48,33 @@ public class Cliente {
         this.nombreCompleto = nombreCompleto;
     }
 
+    public void agregarContrato(Contrato contrato) throws BancoException {
+        if (contrato == null) {
+            throw new BancoException("El contrato no puede ser nulo");
+        }
+
+        for (Contrato c : contratos) {
+            if (c.getTipoCuenta().equals(contrato.getTipoCuenta())) {
+                throw new BancoException("El cliente ya tiene un contrato de este tipo de cuenta");
+            }
+        }
+
+        if (contratos.size() > 2) {
+            throw new BancoException("El cliente no puede tener más de 3 contratos");
+        }
+
+        contratos.add(contrato);
+        contrato.asociarCliente(this);
+    }
+
+    public ArrayList<Contrato> getContratos() {
+        return contratos;
+    }
+
     // Todo Aclarar esto metodo!
 
     public void datosTelefono(){
         System.out.println("Cliente");
-    }
-
-    public void firmaContrato(){
-        System.out.println("Firma contrato");
     }
 
     public void realizarDeposito(){
@@ -52,4 +84,9 @@ public class Cliente {
     public void sacarDinero(){
         System.out.println("Saca dinero");
     }
+
+    public String getRandomString(){
+        return UUID.randomUUID().toString();
+    }
+
 }

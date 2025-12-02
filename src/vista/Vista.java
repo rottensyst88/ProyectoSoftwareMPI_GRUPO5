@@ -1,11 +1,14 @@
 package vista;
 
+import controlador.ControladorSistema;
+import excepcion.BancoException;
+
 import java.util.Scanner;
 
 public class Vista {
 
+    // Patron Singleton
     private static Vista vista;
-    private Scanner sc = new Scanner(System.in);
 
     private Vista(){}
 
@@ -16,8 +19,10 @@ public class Vista {
         return vista;
     }
 
-    public void menu(){
+    // Variables
+    private Scanner sc = new Scanner(System.in);
 
+    public void menu(){
         do{
             System.out.println("""
                 ....:: MENU ::....
@@ -31,6 +36,7 @@ public class Vista {
             System.out.print("OPCION? ");
 
             int num = sc.nextInt();
+            sc.nextLine();
 
             switch(num){
                 case 1:
@@ -43,7 +49,7 @@ public class Vista {
                     System.out.println("Crear cuenta de cliente");
                     break;
                 case 4:
-                    System.out.println("Listar datos");
+                    listarClientes();
                     break;
                 case 99:
                     System.exit(0);
@@ -51,5 +57,37 @@ public class Vista {
                     System.out.println("Opcion no valida");
             }
         }while(true);
+    }
+
+    private void crearCliente(){
+        System.out.println("....:: Crear cliente ::....");
+
+        try{
+            String nombreCompleto = ingresarDatos("Nombre completo");
+            String rut = ingresarDatos("RUT");
+            String direccion = ingresarDatos("Direccion");
+
+            ControladorSistema.getInstancia().crearCliente(nombreCompleto, rut, direccion);
+        } catch (BancoException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private void listarClientes(){
+        String[][] datosClientes = ControladorSistema.getInstancia().listarClientes();
+
+        System.out.println("....:: LISTA DE CLIENTES ::....");
+        for(int i = 0; i < datosClientes.length; i++){
+            System.out.println("Nombre: " + datosClientes[i][0]);
+            System.out.println("RUT: " + datosClientes[i][1]);
+            System.out.println("Domicilio: " + datosClientes[i][2]);
+            System.out.println("-------------------------");
+        }
+    }
+
+    private String ingresarDatos(String x){
+        System.out.print(x + "? ");
+        return sc.nextLine();
     }
 }

@@ -1,17 +1,28 @@
 package vista;
 
+import controlador.ControladorSistema;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 
-public class GuiPrincipal extends JDialog {
+public class ListarClientes extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JTable table1;
 
-    public GuiPrincipal() {
+    private String[][] listaDatos = ControladorSistema.getInstancia().listarClientes();
+    private String[] columnas = {"Nombre completo","Rut","Dirección"};
+
+
+
+    public ListarClientes() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+
+        table1.setModel(new DefaultTableModel(listaDatos, columnas));
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -52,9 +63,8 @@ public class GuiPrincipal extends JDialog {
     }
 
     public static void main(String[] args) {
-        GuiPrincipal dialog = new GuiPrincipal();
+        ListarClientes dialog = new ListarClientes();
         dialog.pack();
         dialog.setVisible(true);
-        System.exit(0);
     }
 }

@@ -2,24 +2,26 @@ package modelo;
 
 import java.time.LocalDateTime;
 
+import static java.lang.Math.random;
+
 public class Contrato {
 
     private long idContrato;
     private LocalDateTime fechaContrato;
-    private Contrato contrato; // QUE ES ESTO!
+    private Cliente clienteAsociado;
+    private boolean firmadoPorCliente;
+    private String tipoCuenta;
 
-    public Contrato(long idContrato, LocalDateTime fechaContrato, Contrato contrato) {
-        this.idContrato = idContrato;
-        this.fechaContrato = fechaContrato;
-        this.contrato = contrato;
+    public Contrato(String tipoCuenta) {
+        this.idContrato = (long) (random() * 1000000L);
+        this.fechaContrato = LocalDateTime.now();
+        this.clienteAsociado = null;
+        firmadoPorCliente = false;
+        this.tipoCuenta = tipoCuenta;
     }
 
     public long getIdContrato() {
         return idContrato;
-    }
-
-    public void setIdContrato(long idContrato) {
-        this.idContrato = idContrato;
     }
 
     public LocalDateTime getFechaContrato() {
@@ -30,11 +32,19 @@ public class Contrato {
         this.fechaContrato = fechaContrato;
     }
 
-    public Contrato getContrato() {
-        return contrato;
+    public void asociarCliente(Cliente cliente){
+        this.clienteAsociado = cliente;
     }
 
-    public void setContrato(Contrato contrato) {
-        this.contrato = contrato;
+    public void firmarContrato(){
+        this.firmadoPorCliente = true;
+    }
+
+    public boolean isFirmadoPorCliente() {
+        return firmadoPorCliente;
+    }
+
+    public String getTipoCuenta() {
+        return tipoCuenta;
     }
 }
