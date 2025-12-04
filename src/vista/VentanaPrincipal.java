@@ -106,7 +106,7 @@ public class VentanaPrincipal extends JDialog {
         mostrarCuentasClienteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                MostrarDatosCuenta.main(null);
+                mostrarDatosCliente.main(null);
             }
         });
     }
