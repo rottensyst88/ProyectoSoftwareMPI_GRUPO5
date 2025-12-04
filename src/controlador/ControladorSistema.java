@@ -151,10 +151,6 @@ public class ControladorSistema implements Serializable {
         return Optional.empty();
     }
 
-    public void setInstancia (ControladorSistema nuevaInstancia) {
-        instancia = nuevaInstancia;
-    }
-
     public void saveControlador() {
         try{
             IOPersistencia.getInstance().saveControladores(this);
@@ -164,11 +160,11 @@ public class ControladorSistema implements Serializable {
     }
 
     public void readDatosSistema() throws BancoException {
-        Object controladoresIO;
+        ControladorSistema controladoresIO;
         try {
             controladoresIO = IOPersistencia.getInstance().readControladores();
             if(controladoresIO != null){
-                instancia = (ControladorSistema) controladoresIO;
+                instancia = controladoresIO;
             }
 
         } catch (BancoException e) {

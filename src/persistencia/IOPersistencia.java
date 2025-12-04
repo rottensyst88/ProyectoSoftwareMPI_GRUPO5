@@ -1,5 +1,6 @@
 package persistencia;
 
+import controlador.ControladorSistema;
 import excepcion.BancoException;
 
 import java.io.*;
@@ -30,15 +31,16 @@ public class IOPersistencia implements Serializable {
         }
     }
 
-    public Object[] readControladores() throws BancoException {
+
+    public ControladorSistema readControladores() throws BancoException {
         ObjectInputStream objetoArch = null;
-        ArrayList<Object> objetosLeidos = new ArrayList<>();
+        ArrayList<ControladorSistema> objetosLeidos = new ArrayList<ControladorSistema>();
         try {
             objetoArch = new ObjectInputStream(new FileInputStream("SVPObjetos.obj"));
-            Object objeto;
+            ControladorSistema objeto;
             while (true) {
                 try {
-                    objeto = objetoArch.readObject();
+                    objeto = (ControladorSistema) objetoArch.readObject();
                     objetosLeidos.add(objeto);
                 } catch (EOFException e) {
                     break;
@@ -57,7 +59,7 @@ public class IOPersistencia implements Serializable {
                 }
             }
         }
-        return objetosLeidos.toArray();
+        System.out.println("Cantidad de objetos leidos: " + objetosLeidos.size());
+        return objetosLeidos.getFirst();
     }
-
 }
