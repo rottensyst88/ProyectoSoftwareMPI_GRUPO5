@@ -3,7 +3,8 @@ package controlador;
 import modelo.Cliente;
 import excepcion.BancoException;
 import modelo.Contrato;
-import modelo.cuentas.Cuenta;
+import modelo.Cuenta;
+import modelo.tarjetas.Tarjeta;
 import persistencia.IOPersistencia;
 
 import java.io.Serializable;
@@ -26,7 +27,6 @@ public class ControladorSistema implements Serializable {
 
     // Se inician metodos del sistema!
     ArrayList<Cliente> clientes = new ArrayList<>();
-    ArrayList<Cuenta> cuentas = new ArrayList<>();
 
     public void crearCliente(String nombre, String rut, String domicilio) throws BancoException {
 
@@ -77,8 +77,20 @@ public class ControladorSistema implements Serializable {
         try{
             for (Contrato contrato : contratos) {
                 if (contrato.getTipoCuenta().equals(tipoCuenta)) {
+
+                    if(contrato.isFirmadoPorCliente()){
+                        throw new BancoException("El contrato ya ha sido firmado");
+                    }
+
                     contrato.firmarContrato();
                     contratoEncontrado = true;
+
+                    if (tipoCuenta.equals("CUENTA CORRIENTE") || tipoCuenta.equals("CUENTA RUT") || tipoCuenta.equals("CUENTA AHORRO")){
+                        Cuenta cuenta = new Cuenta(tipoCuenta);
+
+                        cliente.get().agregarCuenta(cuenta);
+                        cuenta.asociarCliente(cliente.get());
+                    }else{ throw new BancoException("Tipo de cuenta no reconocido"); }
                     break;
                 }
             }
@@ -86,16 +98,27 @@ public class ControladorSistema implements Serializable {
             throw new BancoException(e.getMessage());
         }
 
+        System.out.println("DEBUG: Contrato firmado para el cliente " + rutCliente + " y tipo de cuenta " + tipoCuenta);
+        System.out.println("DEBUG: Clave proporcionada: " + claveUsuario);
+        System.out.println("DEBUG: Datos de la tarjeta del cliente");
+
+        for (Cuenta c : cliente.get().getCuentas()){
+            for (String x : c.getTarjetaAsociada().obtenerDatos()){
+                System.out.println("DEBUG: " + x);
+            }
+        }
+
         return contratoEncontrado;
     }
 
     public String[][] listarClientes() {
-        String[][] datosClientes = new String[clientes.size()][3];
+        String[][] datosClientes = new String[clientes.size()][4];
 
         for (int i = 0; i < clientes.size(); i++) {
             datosClientes[i][0] = clientes.get(i).getNombreCompleto();
             datosClientes[i][1] = clientes.get(i).getRut();
             datosClientes[i][2] = clientes.get(i).getDomicilio();
+            datosClientes[i][3] = clientes.get(i).getClavePersonal();
         }
 
         return datosClientes;
@@ -151,11 +174,11 @@ public class ControladorSistema implements Serializable {
         return Optional.empty();
     }
 
-    public void saveControlador() {
+    public void saveControlador() throws BancoException {
         try{
             IOPersistencia.getInstance().saveControladores(this);
         } catch (BancoException e) {
-            System.out.println(e.getMessage());
+            throw new BancoException(e.getMessage());
         }
     }
 

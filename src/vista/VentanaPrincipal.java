@@ -12,7 +12,7 @@ public class VentanaPrincipal extends JDialog {
     private JButton acercaDeButton;
     private JButton crearClienteButton;
     private JButton crearContratoButton;
-    private JButton crearCuentaClienteButton;
+    private JButton mostrarCuentasClienteButton;
     private JButton listarClientesButton;
     private JButton firmarContratoButton;
     private JPanel panelFoto;
@@ -92,7 +92,21 @@ public class VentanaPrincipal extends JDialog {
         opcionesPersist.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OpcionesPersistencia.main(null);
+
+                try{
+                    OpcionesPersistencia.main(null);
+                } catch (BancoException e1){
+                    JOptionPane.showMessageDialog(null,
+                            e1.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        mostrarCuentasClienteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                MostrarDatosCuenta.main(null);
             }
         });
     }

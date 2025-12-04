@@ -99,6 +99,8 @@ public class CrearCliente extends JDialog {
     private void createAndShowGUI(String rut) {
         String longText = "Tiene que copiar la siguiente cadena de texto: " + ControladorSistema.getInstancia().obtenerClaveCliente(rut);
 
+
+
         JTextArea textArea = new JTextArea(5, 30);
         textArea.setText(longText);
         textArea.setEditable(false);

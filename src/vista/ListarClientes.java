@@ -13,7 +13,7 @@ public class ListarClientes extends JDialog {
     private JTable table1;
 
     private String[][] listaDatos = ControladorSistema.getInstancia().listarClientes();
-    private String[] columnas = {"Nombre completo","Rut","Dirección"};
+    private String[] columnas = {"Nombre completo","Rut","Dirección","Clave"};
 
 
 

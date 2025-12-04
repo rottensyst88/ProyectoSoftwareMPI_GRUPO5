@@ -92,12 +92,12 @@
               <text value="Crear Cliente"/>
             </properties>
           </component>
-          <component id="b51e3" class="javax.swing.JButton" binding="crearCuentaClienteButton">
+          <component id="b51e3" class="javax.swing.JButton" binding="mostrarCuentasClienteButton">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Crear Cuenta"/>
+              <text value="Mostrar Cuentas de Cliente"/>
             </properties>
           </component>
           <component id="3e8a8" class="javax.swing.JButton" binding="listarClientesButton">

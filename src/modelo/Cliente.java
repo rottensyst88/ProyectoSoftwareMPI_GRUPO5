@@ -6,11 +6,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
+
 public class Cliente implements Serializable {
     private String rut;
     private String domicilio;
     private String nombreCompleto;
     private ArrayList<Contrato> contratos;
+    private ArrayList<Cuenta> cuentas;
     private String clavePersonal;
 
     public Cliente(String nombreCompleto, String rut, String domicilio) {
@@ -18,6 +20,7 @@ public class Cliente implements Serializable {
         this.domicilio = domicilio;
         this.nombreCompleto = nombreCompleto;
         this.contratos = new ArrayList<>();
+        this.cuentas = new ArrayList<>();
         this.clavePersonal = getRandomString();
     }
 
@@ -70,6 +73,29 @@ public class Cliente implements Serializable {
 
     public ArrayList<Contrato> getContratos() {
         return contratos;
+    }
+
+    public ArrayList<Cuenta> getCuentas() {
+        return cuentas;
+    }
+
+    public void agregarCuenta(Cuenta cuenta) throws BancoException {
+        if (cuenta == null) {
+            throw new BancoException("La cuenta no puede ser nula");
+        }
+
+        for (Cuenta c : cuentas) {
+            if (c.getTipoCuenta().equals(cuenta.getTipoCuenta())) {
+                throw new BancoException("El cliente ya tiene una cuenta de este tipo");
+            }
+        }
+
+        if (cuentas.size() > 2) {
+            throw new BancoException("El cliente no puede tener más de 3 cuentas");
+        }
+
+        cuentas.add(cuenta);
+        cuenta.asociarCliente(this);
     }
 
     // Todo Aclarar esto metodo!
