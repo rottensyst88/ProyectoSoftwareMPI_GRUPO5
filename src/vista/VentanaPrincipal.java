@@ -18,6 +18,7 @@ public class VentanaPrincipal extends JDialog {
     private JPanel panelFoto;
     private JLabel foto;
     private JPanel botones;
+    private JButton opcionesPersist;
 
     public VentanaPrincipal() {
 
@@ -66,7 +67,7 @@ public class VentanaPrincipal extends JDialog {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    VincularContrato.main(null);
+                    GenerarContrato.main(null);
                 }catch (BancoException e1){
                     JOptionPane.showMessageDialog(null,
                             e1.getMessage(),
@@ -86,6 +87,12 @@ public class VentanaPrincipal extends JDialog {
                             JOptionPane.ERROR_MESSAGE);
                 }
 
+            }
+        });
+        opcionesPersist.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OpcionesPersistencia.main(null);
             }
         });
     }

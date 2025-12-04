@@ -2,10 +2,11 @@ package modelo;
 
 import excepcion.BancoException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Cliente {
+public class Cliente implements Serializable {
     private String rut;
     private String domicilio;
     private String nombreCompleto;

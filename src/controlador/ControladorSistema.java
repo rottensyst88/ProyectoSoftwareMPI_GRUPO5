@@ -4,11 +4,13 @@ import modelo.Cliente;
 import excepcion.BancoException;
 import modelo.Contrato;
 import modelo.cuentas.Cuenta;
+import persistencia.IOPersistencia;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class ControladorSistema {
+public class ControladorSistema implements Serializable {
 
     private static ControladorSistema instancia;
 
@@ -149,4 +151,28 @@ public class ControladorSistema {
         return Optional.empty();
     }
 
+    public void setInstancia (ControladorSistema nuevaInstancia) {
+        instancia = nuevaInstancia;
+    }
+
+    public void saveControlador() {
+        try{
+            IOPersistencia.getInstance().saveControladores(this);
+        } catch (BancoException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void readDatosSistema() throws BancoException {
+        Object controladoresIO;
+        try {
+            controladoresIO = IOPersistencia.getInstance().readControladores();
+            if(controladoresIO != null){
+                instancia = (ControladorSistema) controladoresIO;
+            }
+
+        } catch (BancoException e) {
+            throw new BancoException(e.getMessage());
+        }
+    }
 }

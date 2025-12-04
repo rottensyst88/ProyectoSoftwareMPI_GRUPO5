@@ -5,6 +5,7 @@ import excepcion.BancoException;
 import modelo.Cliente;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class FirmarContrato extends JDialog {
@@ -14,6 +15,7 @@ public class FirmarContrato extends JDialog {
     private JComboBox usuarioBox;
     private JComboBox contratosDisponiblesBox;
     private JPasswordField claveUsuarioPassword;
+    private JLabel foto;
 
     private String[][] datosClientes = ControladorSistema.getInstancia().listarClientes();
     private String[][] contratosClientes = null;
@@ -24,6 +26,7 @@ public class FirmarContrato extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
 
         llenarUsuarios();
+        cargarFoto();
 
 
         buttonOK.addActionListener(new ActionListener() {
@@ -128,5 +131,21 @@ public class FirmarContrato extends JDialog {
 
     }
 
+    private void cargarFoto() {
+        try {
+            // Ruta de la imagen (ajusta según tu proyecto)
+            ImageIcon imagenOriginal = new ImageIcon(getClass().getResource("/graficos/firmarContrato.png"));
 
+            // Redimensionar la imagen
+            int ancho = 295;  // Ajusta estos valores según necesites
+            int alto = 56;
+            Image imagenRedimensionada = imagenOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+
+            // Asignar la imagen redimensionada al JLabel
+            foto.setIcon(new ImageIcon(imagenRedimensionada));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

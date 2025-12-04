@@ -4,24 +4,27 @@ import controlador.ControladorSistema;
 import excepcion.BancoException;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
-public class VincularContrato extends JDialog {
+public class GenerarContrato extends JDialog {
     private JPanel contentPane;
     private JButton generarContratoButton;
     private JButton buttonCancel;
     private JComboBox usuariosBox;
     private JComboBox tipocuentaBox;
+    private JLabel foto;
 
     private String[][] listaClientes = ControladorSistema.getInstancia().listarClientes();
 
 
-    public VincularContrato() {
+    public GenerarContrato() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(generarContratoButton);
 
         cargarDatos();
+        cargarFoto();
 
 
         generarContratoButton.addActionListener(new ActionListener() {
@@ -86,7 +89,7 @@ public class VincularContrato extends JDialog {
     }
 
     public static void main(String[] args) {
-        VincularContrato dialog = new VincularContrato();
+        GenerarContrato dialog = new GenerarContrato();
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
@@ -99,6 +102,23 @@ public class VincularContrato extends JDialog {
         }
         for (String[] x : listaClientes) {
             usuariosBox.addItem(x[1]);
+        }
+    }
+
+    private void cargarFoto() {
+        try {
+            // Ruta de la imagen (ajusta según tu proyecto)
+            ImageIcon imagenOriginal = new ImageIcon(getClass().getResource("/graficos/generarContrato.png"));
+
+            // Redimensionar la imagen
+            int ancho = 295;  // Ajusta estos valores según necesites
+            int alto = 56;
+            Image imagenRedimensionada = imagenOriginal.getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
+
+            // Asignar la imagen redimensionada al JLabel
+            foto.setIcon(new ImageIcon(imagenRedimensionada));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

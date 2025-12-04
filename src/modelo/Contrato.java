@@ -1,10 +1,11 @@
 package modelo;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import static java.lang.Math.random;
 
-public class Contrato {
+public class Contrato implements Serializable {
 
     private long idContrato;
     private LocalDateTime fechaContrato;
