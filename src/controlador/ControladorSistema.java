@@ -142,6 +142,29 @@ public class ControladorSistema implements Serializable {
         return datosContratos;
     }
 
+    public String[][] listarCuentasYTarjetasCliente(String rutCliente) throws BancoException {
+        Optional<Cliente> cliente = findCliente(rutCliente);
+
+        if (cliente.isEmpty()) {
+            throw new BancoException("Cliente no encontrado");
+        }
+
+        ArrayList<Cuenta> cuentas = cliente.get().getCuentas();
+        String[][] datosCuentas = new String[cuentas.size()][4];
+
+        for (int i = 0; i < cuentas.size(); i++) {
+            datosCuentas[i][0] = cuentas.get(i).getTipoCuenta();
+
+            Tarjeta tarjeta = cuentas.get(i).getTarjetaAsociada();
+
+            datosCuentas[i][1] = tarjeta.getNumeroTarjeta();
+            datosCuentas[i][2] = tarjeta.getFechaExpiracion();
+            datosCuentas[i][3] = tarjeta.getCvv();
+        }
+
+        return datosCuentas;
+    }
+
     public String obtenerClaveCliente(String rutCliente) throws BancoException {
         Optional<Cliente> cliente = findCliente(rutCliente);
 

@@ -14,7 +14,7 @@ public class Cuenta implements Serializable {
 
     public Cuenta(String tipoCuenta) {
         this.idCuenta = 0;
-        this.saldo = saldo;
+        this.saldo = 0;
         this.tipoCuenta = tipoCuenta;
         this.clienteAsociado = null;
         this.tarjetaAsociada = Tarjeta.generar();

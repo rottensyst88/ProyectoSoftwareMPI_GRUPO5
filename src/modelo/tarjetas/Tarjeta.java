@@ -27,7 +27,23 @@ public class Tarjeta implements Serializable {
     }
 
     public String[] obtenerDatos() {
-        return new String[] {titular,numeroTarjeta, fechaExpiracion, cvv};
+        return new String[] { numeroTarjeta, fechaExpiracion, cvv };
+    }
+
+    public String getNumeroTarjeta() {
+        return numeroTarjeta;
+    }
+
+    public String getTitular() {
+        return titular;
+    }
+
+    public String getFechaExpiracion() {
+        return fechaExpiracion;
+    }
+
+    public String getCvv() {
+        return cvv;
     }
 
     // --- Lógica Privada ---
