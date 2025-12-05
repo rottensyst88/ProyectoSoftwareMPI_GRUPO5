@@ -27,7 +27,7 @@ public class mostrarDatosCliente extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        llenarUsuarios();
+            llenarUsuarios();
 
         buttonCancel.addActionListener(e -> onCancel());
 

@@ -106,7 +106,16 @@ public class VentanaPrincipal extends JDialog {
         mostrarCuentasClienteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                mostrarDatosCliente.main(null);
+
+                try{
+                    mostrarDatosCliente.main(null);
+                } catch (BancoException e1){
+                    JOptionPane.showMessageDialog(null,
+                            e1.getMessage(),
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+
             }
         });
     }
