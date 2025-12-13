@@ -5,8 +5,3 @@ public class VistaLoader {
         VentanaPrincipal.main(null);
     }
 }
-
-/*
-todo Arreglar enlaces entre los combobox
-todo Decorar ventanas
- */
