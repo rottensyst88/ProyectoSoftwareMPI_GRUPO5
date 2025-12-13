@@ -1,7 +1,5 @@
 package modelo;
 
-import modelo.tarjetas.Tarjeta;
-
 import java.io.Serializable;
 
 public class Cuenta implements Serializable {

@@ -5,7 +5,7 @@ import excepcion.BancoException;
 import modelo.Contrato;
 import modelo.Cuenta;
 import modelo.Rut;
-import modelo.tarjetas.Tarjeta;
+import modelo.Tarjeta;
 import persistencia.IOPersistencia;
 
 import java.io.Serializable;
