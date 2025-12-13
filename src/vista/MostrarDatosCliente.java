@@ -14,11 +14,11 @@ public class MostrarDatosCliente extends JDialog {
     private JComboBox<String> clienteBox;
     private JComboBox<String> cuentaBox;
 
-    // Componentes gráficos
-    private JPanel panelFoto; // Se inicializa en createUIComponents
+    // Componentes gráficos (Labels que van sobre la foto)
+    private JPanel panelFoto;
     private JLabel nroLabel;
     private JLabel fechaLabel;
-    private JLabel cvvLabel;
+    private JLabel cvvLabel; // Usamos este label para el NOMBRE
 
     String[][] datosClientes = ControladorSistema.getInstancia().listarClientes();
     String[][] cuentasTarjetasDeCl = null;
@@ -29,10 +29,21 @@ public class MostrarDatosCliente extends JDialog {
         getRootPane().setDefaultButton(buttonOK);
         setTitle("Visualizar Tarjeta");
 
+        // --- 1. PERSONALIZACIÓN DE BOTONES ---
+        Color naranjaOscuro = new Color(211, 84, 0);
+        Color rojoSalir = new Color(192, 57, 43);
+
+        personalizarBoton(buttonOK, naranjaOscuro, Color.WHITE, false);
+        buttonOK.setText("Ver Tarjeta");
+
+        personalizarBoton(buttonCancel, rojoSalir, Color.WHITE, true);
+        buttonCancel.setText("Volver");
+        // -------------------------------------
+
         try {
             llenarUsuarios();
         } catch (BancoException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
+            // El manejo de errores críticos se hace ahora desde el main o validación previa
         }
 
         buttonCancel.addActionListener(e -> onCancel());
@@ -48,7 +59,6 @@ public class MostrarDatosCliente extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        // Al seleccionar cliente, cargar sus cuentas
         clienteBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -56,8 +66,6 @@ public class MostrarDatosCliente extends JDialog {
             }
         });
 
-        // Al cambiar de cuenta en el combo, actualizar la foto en tiempo real (opcional)
-        // O dejarlo solo al presionar el botón, como prefieras. Aquí lo puse en el botón OK.
         buttonOK.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,78 +74,149 @@ public class MostrarDatosCliente extends JDialog {
         });
     }
 
-    // --- INICIALIZACIÓN DE LA FOTO ---
+    // --- VALIDACIÓN DE APERTURA ---
+    public boolean validarEstadoSistema() {
+        if (datosClientes == null || datosClientes.length == 0) {
+            JOptionPane.showMessageDialog(null, "No existen clientes registrados en el sistema.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        boolean hayCuentasActivas = false;
+        for (String[] cliente : datosClientes) {
+            String rut = cliente[1];
+            try {
+                String[][] cuentas = ControladorSistema.getInstancia().listarCuentasYTarjetasCliente(rut);
+                if (cuentas != null && cuentas.length > 0) {
+                    hayCuentasActivas = true;
+                    break;
+                }
+            } catch (Exception e) {
+                // Ignorar error individual, seguir buscando
+            }
+        }
+
+        if (!hayCuentasActivas) {
+            JOptionPane.showMessageDialog(null, "No existen cuentas activas (con contrato firmado) para mostrar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    // --- INICIALIZACIÓN DE LA FOTO (SOLUCIÓN DE VISIBILIDAD) ---
     private void createUIComponents() {
-        // Carga inicial (puedes poner una imagen por defecto o vacía)
         panelFoto = new PanelConFondo("/Recursos/cuenta_rut.png");
+        panelFoto.setLayout(null); // Permite posicionamiento manual (X, Y)
+
+        // SOLUCIÓN: Forzar la instanciación de los labels y agregarlos al panel.
+        nroLabel = new JLabel();
+        fechaLabel = new JLabel();
+        cvvLabel = new JLabel();
+
+        int anchoTotal = 300;
+        int altoLinea = 20;
+
+        // Establecer un tamaño inicial para que el layout(null) los muestre
+        nroLabel.setBounds(30, 120, anchoTotal, altoLinea);
+        fechaLabel.setBounds(140, 150, 100, altoLinea);
+        cvvLabel.setBounds(30, 185, anchoTotal, altoLinea);
+
+        panelFoto.add(nroLabel);
+        panelFoto.add(fechaLabel);
+        panelFoto.add(cvvLabel);
     }
 
     private void onCancel() {
         dispose();
     }
 
-    // --- LÓGICA PRINCIPAL DE CAMBIO DE FOTO Y DATOS ---
+    // --- LÓGICA DE VISUALIZACIÓN Y POSICIONAMIENTO ---
     private void actualizarTarjetaVisual() {
         if (clienteBox.getSelectedItem() == null || cuentaBox.getSelectedItem() == null) {
             return;
         }
 
-        String seleccionCuenta = cuentaBox.getSelectedItem().toString(); // Ej: "CUENTA RUT", "CUENTA AHORRO"
+        String seleccionCuenta = cuentaBox.getSelectedItem().toString();
         String seleccionCliente = clienteBox.getSelectedItem().toString();
+
+        String nombreCompleto = obtenerNombrePorRut(seleccionCliente);
 
         try {
             String[][] datos = ControladorSistema.getInstancia().listarCuentasYTarjetasCliente(seleccionCliente);
 
             for (String[] d : datos) {
-                // d[0] es el Tipo de Cuenta
                 if (d[0].equals(seleccionCuenta)) {
 
-                    // 1. Llenar los datos siempre
-                    nroLabel.setText(aux_FormatearDatosVentana(d[1]));   // Número
-                    fechaLabel.setText(d[2]); // Fecha
-                    cvvLabel.setText(d[3]);   // CVV / Nombre
+                    String numeroRaw = d[1];
+                    String fechaRaw = d[2];
 
-                    // 2. Lógica de Diferenciación
                     String tipo = seleccionCuenta.toUpperCase();
                     PanelConFondo panel = (PanelConFondo) panelFoto;
 
+                    // 1. CONFIGURACIÓN VISUAL COMÚN
+                    nroLabel.setVisible(true);
+                    fechaLabel.setVisible(true);
+                    cvvLabel.setVisible(true);
+
+                    // Requerimiento: TODO EL TEXTO DEBE SER NEGRO
+                    nroLabel.setForeground(Color.BLACK);
+                    fechaLabel.setForeground(Color.BLACK);
+                    cvvLabel.setForeground(Color.BLACK);
+
+                    // Tipografía
+                    Font fuenteTarjeta = new Font("SansSerif", Font.BOLD, 14);
+                    nroLabel.setFont(fuenteTarjeta);
+                    fechaLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+                    cvvLabel.setFont(fuenteTarjeta);
+
+                    // Establecer el Nombre del titular (Requerimiento)
+                    cvvLabel.setText(nombreCompleto.toUpperCase());
+
+                    // 2. CONFIGURACIÓN ESPECÍFICA POR TIPO
+
                     if (tipo.contains("AHORRO")) {
-                        // --- CASO CUENTA AHORRO ---
-                        // Ruta de tu imagen en la carpeta Recursos/graficos
+                        // ** CUENTA AHORRO - Requerimiento: Solo mostrar el número y nombre **
                         panel.setImagen("/Recursos/cuenta_ahorro.jpg");
 
-                        // Configuración visual específica de Ahorro
-                        nroLabel.setVisible(true);
-                        fechaLabel.setVisible(false); // Generalmente no tienen fecha visible al frente
-                        cvvLabel.setVisible(false);   // Ni CVV
+                        // Texto: Solo el número de cuenta y la fecha (el nombre va en cvvLabel)
+                        nroLabel.setText(numeroRaw);
+                        fechaLabel.setText("FECHA: " + fechaRaw);
 
-                        // Ajustar color de texto si es necesario (ej. Negro para fondo claro)
-                        nroLabel.setForeground(Color.BLACK);
+                        // POSICIÓN: Ajustada para el diseño vertical de Ahorro
+                        nroLabel.setLocation(40, 100);
+                        cvvLabel.setLocation(40, 150); // El nombre va un poco más abajo
+
+                        // Ocultar fecha (solo mostramos número y nombre)
+                        fechaLabel.setVisible(false);
 
                     } else if (tipo.contains("RUT")) {
-                        // --- CASO CUENTA RUT ---
+                        // ** CUENTA RUT **
                         panel.setImagen("/Recursos/cuenta_rut.png");
 
-                        // Configuración visual: Mostrar todo
-                        nroLabel.setVisible(true);
-                        fechaLabel.setVisible(true);
-                        cvvLabel.setVisible(true);
+                        // Texto: Formato Tarjeta (con espacios) y Fecha
+                        nroLabel.setText(formatearNumeroTarjeta(numeroRaw));
+                        fechaLabel.setText("VALIDA HASTA: " + fechaRaw);
 
-                        nroLabel.setForeground(Color.WHITE); // Texto blanco para fondos oscuros
+                        // POSICIÓN: Ajustada
+                        nroLabel.setLocation(30, 120);
+                        fechaLabel.setLocation(140, 150);
+                        cvvLabel.setLocation(30, 185);
 
                     } else if (tipo.contains("CORRIENTE")) {
-                        // --- CASO CUENTA CORRIENTE ---
+                        // ** CUENTA CORRIENTE **
                         panel.setImagen("/Recursos/cuenta_corriente.png");
 
-                        // Configuración visual: Mostrar todo
-                        nroLabel.setVisible(true);
-                        fechaLabel.setVisible(true);
-                        cvvLabel.setVisible(true);
+                        // Texto: Formato Tarjeta (con espacios) y Fecha
+                        nroLabel.setText(formatearNumeroTarjeta(numeroRaw));
+                        fechaLabel.setText("VALIDA HASTA: " + fechaRaw);
 
-                        nroLabel.setForeground(Color.WHITE);
+                        // POSICIÓN: Ajustada
+                        nroLabel.setLocation(40, 130);
+                        fechaLabel.setLocation(40, 155);
+                        cvvLabel.setLocation(40, 180);
                     }
 
-                    // Forzar actualización visual
+                    // Forzar actualización
                     panelFoto.repaint();
                     panelFoto.revalidate();
                 }
@@ -147,38 +226,94 @@ public class MostrarDatosCliente extends JDialog {
         }
     }
 
-    private void llenarUsuarios() throws BancoException {
-        if (datosClientes.length == 0){
-            throw new BancoException("No existe el cliente");
+    /**
+     * Busca el nombre completo de un cliente usando su RUT.
+     * @param rut El RUT a buscar.
+     */
+    private String obtenerNombrePorRut(String rut) {
+        if (datosClientes == null) return "NOMBRE NO DISPONIBLE";
+
+        // Asumiendo que datosClientes es [Nombre completo (0), Rut (1), Dirección (2), Clave (3)]
+        for (String[] cliente : datosClientes) {
+            if (cliente.length > 1 && cliente[1].equals(rut)) {
+                return cliente[0]; // Retorna el Nombre Completo (índice 0)
+            }
         }
+        return "NOMBRE NO ENCONTRADO";
+    }
+
+    // Método para poner espacios cada 4 dígitos: 12345678 -> 1234 5678
+    private String formatearNumeroTarjeta(String numero) {
+        if (numero == null) return "";
+        String limpio = numero.replace(" ", "");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < limpio.length(); i++) {
+            if (i > 0 && i % 4 == 0) {
+                sb.append("  ");
+            }
+            sb.append(limpio.charAt(i));
+        }
+        return sb.toString();
+    }
+
+    // --- CARGA DE DATOS Y ESTILO (Métodos auxiliares) ---
+    private void llenarUsuarios() throws BancoException {
+        if (datosClientes == null || datosClientes.length == 0) return;
+        clienteBox.removeAllItems();
         for (String[] c : datosClientes){
             clienteBox.addItem(c[1]);
         }
+        clienteBox.setSelectedIndex(-1);
+        cuentaBox.removeAllItems();
+        cuentaBox.setEnabled(false);
     }
 
     private void actualizarDatosCuenta() {
         if (clienteBox.getSelectedItem() == null) return;
-
         String rutUsuario = clienteBox.getSelectedItem().toString();
         try {
             cuentasTarjetasDeCl = ControladorSistema.getInstancia().listarCuentasYTarjetasCliente(rutUsuario);
         } catch (BancoException e) {
-            throw new RuntimeException(e);
+            cuentaBox.removeAllItems();
+            cuentaBox.setEnabled(false);
+            return;
         }
-
         cuentaBox.removeAllItems();
         if (cuentasTarjetasDeCl != null) {
             for (String[] x : cuentasTarjetasDeCl) {
                 cuentaBox.addItem(x[0]);
             }
+            cuentaBox.setEnabled(true);
         }
     }
 
+    private void personalizarBoton(JButton boton, Color fondo, Color texto, boolean esMini) {
+        if (boton == null) return;
+        boton.setBackground(fondo);
+        boton.setForeground(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(esMini ? 8 : 10, esMini ? 15 : 20, esMini ? 8 : 10, esMini ? 15 : 20));
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) { boton.setBackground(fondo.darker()); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { boton.setBackground(fondo); }
+        });
+    }
+
     public static void main(String[] args) {
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) break;
+            }
+        } catch (Exception e) {}
         MostrarDatosCliente dialog = new MostrarDatosCliente();
-        dialog.setSize(500, 400);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        if (dialog.validarEstadoSistema()) {
+            dialog.setSize(500, 400);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+        } else {
+            dialog.dispose();
+        }
     }
 
     private String aux_FormatearDatosVentana(String OGText){
@@ -205,31 +340,18 @@ public class MostrarDatosCliente extends JDialog {
     // --- CLASE PARA LA IMAGEN DE FONDO ---
     static class PanelConFondo extends JPanel {
         private Image imagen;
-
-        public PanelConFondo(String ruta) {
-            setImagen(ruta);
-        }
-
+        public PanelConFondo(String ruta) { setImagen(ruta); }
         public void setImagen(String ruta) {
             var resource = getClass().getResource(ruta);
             if (resource != null) {
                 imagen = new ImageIcon(resource).getImage();
                 repaint();
-            } else {
-                // Si falla, podrías poner una imagen de error o imprimir en consola
-                System.err.println("No se encontró la imagen: " + ruta);
             }
         }
-
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            if (imagen != null) {
-                // Dibuja la imagen ajustada al tamaño del panel (400x225 aprox para tarjeta)
-                g.drawImage(imagen, 0, 0, 400, 225, this);
-            }
+            if (imagen != null) g.drawImage(imagen, 0, 0, 400, 225, this);
         }
-
-
     }
 }
