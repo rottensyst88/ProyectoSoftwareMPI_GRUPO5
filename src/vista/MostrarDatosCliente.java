@@ -55,7 +55,7 @@ public class MostrarDatosCliente extends JDialog {
 
                     for (String[] d : datos) {
                         if (d[0].equals(cuentaBox.getSelectedItem().toString())) {
-                            nroLabel.setText(d[1]);
+                            nroLabel.setText(aux_FormatearDatosVentana(d[1]));
                             fechaLabel.setText(d[2]);
                             cvvLabel.setText(d[3]);
                         }
@@ -136,5 +136,24 @@ public class MostrarDatosCliente extends JDialog {
         }
     }
 
+    private String aux_FormatearDatosVentana(String OGText){
+        String text = "";
+        byte cont = 1;
 
+        char[] a = OGText.toCharArray();
+
+        for (int i = 0; i < a.length; i++){
+
+            text += a[i];
+
+            if (cont == 4){
+                text += " ";
+                cont = 1;
+            }else{
+                cont++;
+            }
+        }
+
+        return text.trim();
+    }
 }

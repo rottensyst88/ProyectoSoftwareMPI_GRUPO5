@@ -149,8 +149,8 @@ public class VentanaPrincipal extends JDialog {
 
     private void acercaDe(){
         JOptionPane.showMessageDialog(this,
-                "Sistema Bancario v1.0\n" +
-                        "Sistema de prueba, Versión de compilación 29NOV2025\n",
+                "Sistema Bancario v0.9\n" +
+                        "Sistema de prueba, Versión de compilación 13DIC2025\n",
                 "Acerca de",
                 JOptionPane.INFORMATION_MESSAGE);
     }
