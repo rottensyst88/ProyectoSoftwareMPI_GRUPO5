@@ -26,6 +26,16 @@ public class GenerarContrato extends JDialog {
         cargarDatos();
         cargarFoto();
 
+        // --- INICIO CAMBIOS VISUALES ---
+        // 1. Estilo Naranja Oscuro para el botón principal
+        Color naranjaOscuro = new Color(211, 84, 0);
+        personalizarBoton(generarContratoButton, naranjaOscuro, Color.WHITE, false);
+
+        // 2. Estilo Rojo para el botón cancelar
+        Color rojoSalir = new Color(192, 57, 43);
+        personalizarBoton(buttonCancel, rojoSalir, Color.WHITE, true);
+        // --- FIN CAMBIOS VISUALES ---
+
 
         generarContratoButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -121,4 +131,23 @@ public class GenerarContrato extends JDialog {
             e.printStackTrace();
         }
     }
+
+    // --- MÉTODOS VISUALES AGREGADOS ---
+    private void personalizarBoton(JButton boton, Color fondo, Color texto, boolean esMini) {
+        boton.setBackground(fondo);
+        boton.setForeground(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        if (esMini) {
+            boton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        } else {
+            boton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        }
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) { boton.setBackground(fondo.darker()); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { boton.setBackground(fondo); }
+        });
+    }
+    // ---------------------------------
+
 }
