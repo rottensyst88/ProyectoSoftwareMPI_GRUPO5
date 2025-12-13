@@ -105,7 +105,7 @@ public class MostrarDatosCliente extends JDialog {
 
     // --- INICIALIZACIÓN DE LA FOTO (SOLUCIÓN DE VISIBILIDAD) ---
     private void createUIComponents() {
-        panelFoto = new PanelConFondo("/Recursos/cuenta_rut.png");
+        panelFoto = new PanelConFondo("/graficos/cuenta_rut.png");
         panelFoto.setLayout(null); // Permite posicionamiento manual (X, Y)
 
         // SOLUCIÓN: Forzar la instanciación de los labels y agregarlos al panel.
@@ -176,7 +176,7 @@ public class MostrarDatosCliente extends JDialog {
 
                     if (tipo.contains("AHORRO")) {
                         // ** CUENTA AHORRO - Requerimiento: Solo mostrar el número y nombre **
-                        panel.setImagen("/Recursos/cuenta_ahorro.jpg");
+                        panel.setImagen("/graficos/cuenta_ahorro.jpg");
 
                         // Texto: Solo el número de cuenta y la fecha (el nombre va en cvvLabel)
                         nroLabel.setText(numeroRaw);
@@ -191,7 +191,7 @@ public class MostrarDatosCliente extends JDialog {
 
                     } else if (tipo.contains("RUT")) {
                         // ** CUENTA RUT **
-                        panel.setImagen("/Recursos/cuenta_rut.png");
+                        panel.setImagen("/graficos/cuenta_rut.png");
 
                         // Texto: Formato Tarjeta (con espacios) y Fecha
                         nroLabel.setText(formatearNumeroTarjeta(numeroRaw));
@@ -204,7 +204,7 @@ public class MostrarDatosCliente extends JDialog {
 
                     } else if (tipo.contains("CORRIENTE")) {
                         // ** CUENTA CORRIENTE **
-                        panel.setImagen("/Recursos/cuenta_corriente.png");
+                        panel.setImagen("/graficos/cuenta_corriente.png");
 
                         // Texto: Formato Tarjeta (con espacios) y Fecha
                         nroLabel.setText(formatearNumeroTarjeta(numeroRaw));
