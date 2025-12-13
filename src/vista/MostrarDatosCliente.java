@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class mostrarDatosCliente extends JDialog {
+public class MostrarDatosCliente extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -23,7 +23,7 @@ public class mostrarDatosCliente extends JDialog {
     String[][] datosClientes = ControladorSistema.getInstancia().listarClientes();
     String[][] cuentasTarjetasDeCl = null;
 
-    public mostrarDatosCliente() {
+    public MostrarDatosCliente() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -93,7 +93,7 @@ public class mostrarDatosCliente extends JDialog {
                 if (d[0].equals(seleccionCuenta)) {
 
                     // 1. Llenar los datos siempre
-                    nroLabel.setText(d[1]);   // Número
+                    nroLabel.setText(aux_FormatearDatosVentana(d[1]));   // Número
                     fechaLabel.setText(d[2]); // Fecha
                     cvvLabel.setText(d[3]);   // CVV / Nombre
 
@@ -175,10 +175,31 @@ public class mostrarDatosCliente extends JDialog {
     }
 
     public static void main(String[] args) {
-        mostrarDatosCliente dialog = new mostrarDatosCliente();
+        MostrarDatosCliente dialog = new MostrarDatosCliente();
         dialog.setSize(500, 400);
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+    }
+
+    private String aux_FormatearDatosVentana(String OGText){
+        String text = "";
+        byte cont = 1;
+
+        char[] a = OGText.toCharArray();
+
+        for (int i = 0; i < a.length; i++){
+
+            text += a[i];
+
+            if (cont == 4){
+                text += " ";
+                cont = 1;
+            }else{
+                cont++;
+            }
+        }
+
+        return text.trim();
     }
 
     // --- CLASE PARA LA IMAGEN DE FONDO ---
@@ -208,5 +229,7 @@ public class mostrarDatosCliente extends JDialog {
                 g.drawImage(imagen, 0, 0, 400, 225, this);
             }
         }
+
+
     }
 }
