@@ -24,8 +24,23 @@ public class FirmarContrato extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        setTitle("Firmar Contrato");
 
-        llenarUsuarios();
+        // --- INICIO CAMBIOS VISUALES ---
+        // 1. Estilo Naranja Oscuro para el botón principal (Firmar)
+        Color naranjaOscuro = new Color(211, 84, 0);
+        personalizarBoton(buttonOK, naranjaOscuro, Color.WHITE, false);
+
+        // 2. Estilo Rojo para el botón cancelar
+        Color rojoSalir = new Color(192, 57, 43);
+        personalizarBoton(buttonCancel, rojoSalir, Color.WHITE, true);
+        // --- FIN CAMBIOS VISUALES ---
+
+        try {
+            llenarUsuarios();
+        } catch (BancoException e) {
+
+        }
         cargarFoto();
 
 
@@ -92,25 +107,117 @@ public class FirmarContrato extends JDialog {
         dispose();
     }
 
+    // --- MÉTODOS VISUALES AGREGADOS ---
+    private void personalizarBoton(JButton boton, Color fondo, Color texto, boolean esMini) {
+        boton.setBackground(fondo);
+        boton.setForeground(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        if (esMini) {
+            boton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        } else {
+            boton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        }
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) { boton.setBackground(fondo.darker()); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { boton.setBackground(fondo); }
+        });
+    }
+    // ---------------------------------
+
     public static void main(String[] args) {
-        FirmarContrato dialog = new FirmarContrato();
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        // --- CAMBIO VISUAL (Nimbus) ---
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            try {
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+            } catch (Exception ex) {}
+        }
+        // ------------------------------
+
+        // *************** VALIDACIÓN ANTES DE ABRIR LA VENTANA ***************
+        try {
+            // Instanciar el diálogo primero para poder llamar a llenarUsuarios
+            FirmarContrato dialog = new FirmarContrato();
+
+            // Reintentar llenar la lista para verificar si hay clientes disponibles
+            dialog.llenarUsuarios();
+
+            // Si el método llenarUsuarios no lanza excepción, significa que hay contratos pendientes.
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
+
+        } catch (BancoException e) {
+            // Si llenarUsuarios lanza una excepción (No hay clientes o no hay contratos pendientes),
+            // mostramos el error y NO abrimos la ventana.
+            JOptionPane.showMessageDialog(null,
+                    e.getMessage(),
+                    "Firmar Contrato",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+        // ********************************************************************
     }
 
+    // ***** MÉTODO MODIFICADO PARA FILTRAR CLIENTES CON CONTRATOS PENDIENTES *****
     private void llenarUsuarios() throws BancoException {
 
-        if (datosClientes.length == 0){
-            throw new BancoException("No existe el cliente");
+        // 1. Verificación básica: ¿Hay clientes en la BD?
+        if (datosClientes == null || datosClientes.length == 0){
+            throw new BancoException("No existen clientes registrados en el sistema.");
         }
 
+        usuarioBox.removeAllItems();
+        boolean seEncontroAlguien = false;
+
+        // 2. Recorremos TODOS los clientes
         for (String[] c : datosClientes){
-            usuarioBox.addItem(c[1]);
+            String rutCliente = c[1]; // Asumiendo que el índice 1 es el RUT
+
+            try {
+                // Obtenemos los contratos de ESTE cliente específico
+                String[][] contratosDelCliente = ControladorSistema.getInstancia().listarContratosCliente(rutCliente);
+
+                // 3. Verificamos si tiene AL MENOS UN contrato "No Firmado"
+                boolean tienePendiente = false;
+                for (String[] contrato : contratosDelCliente) {
+                    // contrato[1] es el estado ("Firmado" o "No Firmado")
+                    if ("No Firmado".equalsIgnoreCase(contrato[1])) {
+                        tienePendiente = true;
+                        break;
+                    }
+                }
+
+                // 4. Si tiene pendientes, lo agregamos a la lista desplegable
+                if (tienePendiente) {
+                    usuarioBox.addItem(rutCliente);
+                    seEncontroAlguien = true;
+                }
+
+            } catch (Exception e) {
+                // Si el cliente no tiene contratos creados, el controlador puede lanzar una excepción. La ignoramos.
+                continue;
+            }
+        }
+
+        // 5. Si después de revisar a todos, nadie tenía contratos pendientes:
+        if (!seEncontroAlguien) {
+            throw new BancoException("No existen clientes con contratos pendientes de firma.");
         }
     }
 
     private void actualizarDatosContrato() {
+        if (usuarioBox.getSelectedItem() == null) {
+            // Esto ocurre cuando se limpian los ítems o no hay ninguno.
+            // Limpiar la lista de contratos por si acaso y salir.
+            contratosDisponiblesBox.removeAllItems();
+            return;}
 
         String rutUsuario = usuarioBox.getSelectedItem().toString();
 

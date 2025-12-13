@@ -22,6 +22,19 @@ public class CrearCliente extends JDialog {
         getRootPane().setDefaultButton(aceptarButton);
         cargarFoto();
 
+        // --- PERSONALIZACIÓN DEL ESTILO (IGUAL A VENTANA PRINCIPAL) ---
+
+        // 1. Estilo Naranja Uniforme para el botón de acción principal "Aceptar"
+        Color naranjaPrincipal = new Color(179, 79, 0); // Naranja Flat
+        Color blancoTexto = Color.WHITE;
+        personalizarBotonUniforme(aceptarButton, naranjaPrincipal, blancoTexto);
+
+        // 2. Estilo Rojo sin borde para el botón "Salir"
+        Color rojoSalir = new Color(192, 57, 43); // Rojo
+        personalizarBotonMini(salirButton, rojoSalir, blancoTexto);
+
+        // --- FIN DE LA PERSONALIZACIÓN ---
+
         aceptarButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -216,6 +229,43 @@ public class CrearCliente extends JDialog {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void personalizarBotonUniforme(JButton boton, Color fondo, Color texto) {
+        boton.setBackground(fondo);
+        boton.setForeground(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Sin borde
+
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(fondo.darker());
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(fondo);
+            }
+        });
+    }
+
+    /**
+     * Personaliza botones pequeños como "Salir" (Rojo, sin borde).
+     */
+    private void personalizarBotonMini(JButton boton, Color fondo, Color texto) {
+        boton.setBackground(fondo);
+        boton.setForeground(texto);
+        boton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15)); // Sin borde
+
+        boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                boton.setBackground(fondo.darker());
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                boton.setBackground(fondo);
+            }
+        });
     }
 
 }
