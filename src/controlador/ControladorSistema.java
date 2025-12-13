@@ -4,6 +4,7 @@ import modelo.Cliente;
 import excepcion.BancoException;
 import modelo.Contrato;
 import modelo.Cuenta;
+import modelo.Rut;
 import modelo.tarjetas.Tarjeta;
 import persistencia.IOPersistencia;
 
@@ -30,7 +31,16 @@ public class ControladorSistema implements Serializable {
 
     public void crearCliente(String nombre, String rut, String domicilio) throws BancoException {
 
-        if (findCliente(rut).isPresent()) {
+        Rut rutObjeto = Rut.of(rut);
+
+        if (rutObjeto == null) {
+            // Si el formato es inválido, lanzamos una excepción.
+            // La vista capturará esta excepción y mostrará el error.
+            throw new BancoException("El formato del RUT ingresado es incorrecto o inválido. Use el formato XX.XXX.XXX-X.");
+        }
+
+
+        if (findCliente(rut).isPresent() || findClientePorNombre(nombre).isPresent()) {
             throw new BancoException("Cliente ya existe");
         }
 
@@ -196,6 +206,25 @@ public class ControladorSistema implements Serializable {
         }
         return Optional.empty();
     }
+
+    public Optional<Cliente> findClientePorNombre(String nombre) {
+
+        // Iteramos sobre todos los clientes en la lista 'clientes'
+        for (Cliente c : clientes) {
+
+            // Comparamos el nombre del cliente con el nombre buscado.
+            // Usamos equalsIgnoreCase() para ignorar mayúsculas y minúsculas
+            // al comparar los nombres (ej. "Juan" es igual a "juan").
+            if (c.getNombreCompleto().equalsIgnoreCase(nombre)) {
+                // Si encontramos una coincidencia, devolvemos un Optional que contiene el cliente.
+                return Optional.of(c);
+            }
+        }
+
+        // Si el bucle termina sin encontrar coincidencias, devolvemos un Optional vacío.
+        return Optional.empty();
+    }
+
 
     public void saveControlador() throws BancoException {
         try{
