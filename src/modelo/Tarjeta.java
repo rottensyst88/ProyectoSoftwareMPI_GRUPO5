@@ -34,10 +34,6 @@ public class Tarjeta implements Serializable {
         return numeroTarjeta;
     }
 
-    public String getTitular() {
-        return titular;
-    }
-
     public String getFechaExpiracion() {
         return fechaExpiracion;
     }

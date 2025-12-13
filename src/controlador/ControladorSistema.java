@@ -184,17 +184,6 @@ public class ControladorSistema implements Serializable {
 
         return cliente.get().getClavePersonal();
     }
-
-    public boolean verificarClaveCliente(String rutCliente, String clave) throws BancoException {
-        Optional<Cliente> cliente = findCliente(rutCliente);
-
-        if (cliente.isEmpty()) {
-            throw new BancoException("Cliente no encontrado");
-        }
-
-        return cliente.get().getClavePersonal().equals(clave);
-    }
-
     // UTILIDADES
 
     private Optional<Cliente> findCliente(String rut){

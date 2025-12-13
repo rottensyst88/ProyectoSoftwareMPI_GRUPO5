@@ -108,7 +108,7 @@ public class GenerarContrato extends JDialog {
     private void cargarDatos() throws BancoException {
 
         if(listaClientes.length == 0){
-            throw new BancoException("No existen empresas en el registro");
+            throw new BancoException("No existen datos en el registro");
         }
         for (String[] x : listaClientes) {
             usuariosBox.addItem(x[1]);

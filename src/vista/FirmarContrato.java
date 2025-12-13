@@ -2,7 +2,6 @@ package vista;
 
 import controlador.ControladorSistema;
 import excepcion.BancoException;
-import modelo.Cliente;
 
 import javax.swing.*;
 import java.awt.*;
@@ -201,8 +200,7 @@ public class FirmarContrato extends JDialog {
                 }
 
             } catch (Exception e) {
-                // Si el cliente no tiene contratos creados, el controlador puede lanzar una excepción. La ignoramos.
-                continue;
+                System.out.println(e.getMessage());
             }
         }
 
