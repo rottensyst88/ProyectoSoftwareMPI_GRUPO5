@@ -113,7 +113,7 @@ public class Cliente implements Serializable {
     }
 
     public String getRandomString(){
-        return UUID.randomUUID().toString();
+        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 
 }

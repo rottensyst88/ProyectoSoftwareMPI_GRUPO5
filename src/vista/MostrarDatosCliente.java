@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class mostrarDatosCliente extends JDialog {
+public class MostrarDatosCliente extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -23,7 +23,7 @@ public class mostrarDatosCliente extends JDialog {
     String[][] datosClientes = ControladorSistema.getInstancia().listarClientes();
     String[][] cuentasTarjetasDeCl = null;
 
-    public mostrarDatosCliente() {
+    public MostrarDatosCliente() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -78,7 +78,7 @@ public class mostrarDatosCliente extends JDialog {
     }
 
     public static void main(String[] args) {
-        mostrarDatosCliente dialog = new mostrarDatosCliente();
+        MostrarDatosCliente dialog = new MostrarDatosCliente();
         dialog.setSize(400, 400); // Asegura un tamaño visible
         dialog.pack();
         dialog.setVisible(true);

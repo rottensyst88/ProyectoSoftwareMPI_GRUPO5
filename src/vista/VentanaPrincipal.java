@@ -131,7 +131,7 @@ public class VentanaPrincipal extends JDialog {
             public void actionPerformed(ActionEvent actionEvent) {
 
                 try{
-                    mostrarDatosCliente.main(null);
+                    MostrarDatosCliente.main(null);
                 } catch (BancoException e1){
                     JOptionPane.showMessageDialog(null,
                             e1.getMessage(),

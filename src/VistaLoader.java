@@ -7,7 +7,7 @@ public class VistaLoader {
 }
 
 /*
-todo Acortar claves de usuario
+todo Acortar claves de usuario              LISTO
 todo Arreglar enlaces entre los combobox
 todo Formatear datos de tarjeta
 todo Decorar ventanas
