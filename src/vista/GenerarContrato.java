@@ -21,7 +21,7 @@ public class GenerarContrato extends JDialog {
     private String[][] listaClientes = ControladorSistema.getInstancia().listarClientes();
 
     // Definimos los tipos de cuenta que el sistema soporta
-    private final String[] TIPOS_CUENTA_TOTALES = {"CUENTA RUT", "CUENTA CORRIENTE", "CUENTA AHORRO"};
+    private final String[] TIPOS_CUENTA_TOTALES = {"CUENTA RUT", "CUENTA CORRIENTE", "CUENTA AHORRO", "LINEA CREDITO"};
 
     public GenerarContrato() {
         setContentPane(contentPane);
