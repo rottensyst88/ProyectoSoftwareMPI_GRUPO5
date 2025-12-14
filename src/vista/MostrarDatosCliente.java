@@ -6,6 +6,7 @@ import excepcion.BancoException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.time.LocalDate;
 
 public class MostrarDatosCliente extends JDialog {
     private JPanel contentPane;
@@ -211,6 +212,15 @@ public class MostrarDatosCliente extends JDialog {
                         fechaLabel.setText("VALIDA HASTA: " + fechaRaw);
 
                         // POSICIÓN: Ajustada
+                        nroLabel.setLocation(40, 130);
+                        fechaLabel.setLocation(40, 155);
+                        cvvLabel.setLocation(40, 180);
+                    } else if (tipo.contains("CREDITO")){
+                        panel.setImagen("/graficos/phaceholder.png");
+
+                        nroLabel.setText("LINEA DE CREDITO - NO APLICA");
+                        fechaLabel.setText("FECHA: " + LocalDate.now());
+
                         nroLabel.setLocation(40, 130);
                         fechaLabel.setLocation(40, 155);
                         cvvLabel.setLocation(40, 180);
