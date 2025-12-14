@@ -148,7 +148,6 @@ public class FirmarContrato extends JDialog {
             // Reintentar llenar la lista para verificar si hay clientes disponibles
             dialog.llenarUsuarios();
 
-            // Si el método llenarUsuarios no lanza excepción, significa que hay contratos pendientes.
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
@@ -164,7 +163,6 @@ public class FirmarContrato extends JDialog {
         // ********************************************************************
     }
 
-    // ***** MÉTODO MODIFICADO PARA FILTRAR CLIENTES CON CONTRATOS PENDIENTES *****
     private void llenarUsuarios() throws BancoException {
 
         // 1. Verificación básica: ¿Hay clientes en la BD?

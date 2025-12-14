@@ -96,6 +96,7 @@
                 <item value="CUENTA CORRIENTE"/>
                 <item value="CUENTA AHORRO"/>
                 <item value="CUENTA RUT"/>
+                <item value="LINEA CREDITO"/>
               </model>
             </properties>
           </component>

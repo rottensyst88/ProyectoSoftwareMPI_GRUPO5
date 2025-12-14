@@ -34,6 +34,8 @@ public class Cliente implements Serializable {
         this.ingresosMensuales = ingresos;
         this.gastosMensuales = gastos;
         this.tieneDeudaCastigada = castigada;
+
+        ratioEndeudamiento = -1;
     }
 
     public void setRatioEndeudamiento(double ratioEndeudamiento) {
@@ -60,24 +62,12 @@ public class Cliente implements Serializable {
         return rut;
     }
 
-    public void setRut(String rut) {
-        this.rut = rut;
-    }
-
     public String getDomicilio() {
         return domicilio;
     }
 
-    public void setDomicilio(String domicilio) {
-        this.domicilio = domicilio;
-    }
-
     public String getNombreCompleto() {
         return nombreCompleto;
-    }
-
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
     }
 
     public void agregarContrato(Contrato contrato) throws BancoException {
@@ -118,30 +108,15 @@ public class Cliente implements Serializable {
             }
         }
 
-        if (cuentas.size() > 2) {
-            throw new BancoException("El cliente no puede tener más de 3 cuentas");
+        if (cuentas.size() > 3) {
+            throw new BancoException("El cliente no puede tener más de 4 cuentas");
         }
 
         cuentas.add(cuenta);
         cuenta.asociarCliente(this);
     }
 
-    // Todo Aclarar esto metodo!
-
-    public void datosTelefono(){
-        System.out.println("Cliente");
-    }
-
-    public void realizarDeposito(){
-        System.out.println("Realiza pago");
-    }
-
-    public void sacarDinero(){
-        System.out.println("Saca dinero");
-    }
-
     public String getRandomString(){
         return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
-
 }

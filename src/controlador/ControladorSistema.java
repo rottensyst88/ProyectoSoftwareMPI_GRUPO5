@@ -57,10 +57,9 @@ public class ControladorSistema implements Serializable {
 
             Contrato contrato = new Contrato(tipoCuenta);
 
-            /*
-            if (cliente.get().getContratos().contains(contrato)) {
-                throw new BancoException("El contrato ya existe para este cliente");
-            }*/
+            if (tipoCuenta.equalsIgnoreCase("LINEA CREDITO") && cliente.get().getRatioEndeudamiento() == -1) {
+                throw new BancoException("No se puede generar contrato de línea de crédito para clientes rechazados");
+            }
 
             try{
                 cliente.get().agregarContrato(contrato);
@@ -95,7 +94,7 @@ public class ControladorSistema implements Serializable {
                     contrato.firmarContrato();
                     contratoEncontrado = true;
 
-                    if (tipoCuenta.equals("CUENTA CORRIENTE") || tipoCuenta.equals("CUENTA RUT") || tipoCuenta.equals("CUENTA AHORRO")){
+                    if (tipoCuenta.equals("CUENTA CORRIENTE") || tipoCuenta.equals("CUENTA RUT") || tipoCuenta.equals("CUENTA AHORRO") || tipoCuenta.equals("LINEA CREDITO")) {
                         Cuenta cuenta = new Cuenta(tipoCuenta);
 
                         cliente.get().agregarCuenta(cuenta);
@@ -137,6 +136,7 @@ public class ControladorSistema implements Serializable {
         if (cliente.isTieneDeudaCastigada()) {
             System.out.println("[RESULTADO]: RECHAZADO AUTOMÁTICAMENTE");
             System.out.println("Motivo: El cliente presenta deuda castigada (Historial negativo).");
+            cliente.setRatioEndeudamiento(-1);
             return -1;
         }
 
@@ -144,6 +144,7 @@ public class ControladorSistema implements Serializable {
         if (cliente.getEdad() < 18) {
             System.out.println("[RESULTADO]: RECHAZADO");
             System.out.println("Motivo: El cliente es menor de edad.");
+            cliente.setRatioEndeudamiento(-1);
             return -1;
         }
 
@@ -151,6 +152,7 @@ public class ControladorSistema implements Serializable {
         if (cliente.getIngresosMensuales() <= 0) {
             System.out.println("[RESULTADO]: RECHAZADO");
             System.out.println("Motivo: No se registran ingresos válidos.");
+            cliente.setRatioEndeudamiento(-1);
             return -1;
         }
 
@@ -163,6 +165,7 @@ public class ControladorSistema implements Serializable {
             System.out.println("Nivel de Riesgo: ALTO");
             System.out.println("[RESULTADO]: RECHAZADO");
             System.out.println("Motivo: Sus gastos superan el 60% de sus ingresos. Capacidad de pago crítica.");
+            cliente.setRatioEndeudamiento(-1);
         } else if (ratioEndeudamiento > 40) {
             System.out.println("Nivel de Riesgo: MEDIO");
             System.out.println("[RESULTADO]: APROBADO CON OBSERVACIONES");
@@ -173,6 +176,7 @@ public class ControladorSistema implements Serializable {
             System.out.println("Nota: Cliente ideal. Se ofrece línea de crédito premium.");
         }
 
+        cliente.setRatioEndeudamiento(ratioEndeudamiento);
         return ratioEndeudamiento;
     }
 
