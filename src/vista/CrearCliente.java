@@ -14,12 +14,17 @@ public class CrearCliente extends JDialog {
     private JTextField rutField;
     private JTextField domicilioField;
     private JLabel foto;
+    private JSpinner edadSpinner;
+    private JTextField ingresoMensField;
+    private JTextField gastosMensualesField;
+    private JCheckBox tieneDeudaCheck;
 
     public CrearCliente() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(aceptarButton);
         cargarFoto();
+        edadSpinner.setModel(new SpinnerNumberModel(18, 18, 120, 1)); // Edad mínima 18 años
 
         // --- PERSONALIZACIÓN DEL ESTILO (IGUAL A VENTANA PRINCIPAL) ---
 
@@ -119,9 +124,12 @@ public class CrearCliente extends JDialog {
         String nombre = nombreField.getText();
         String rut = rutField.getText();
         String domicilio = domicilioField.getText();
+        String ingresoMensualStr = ingresoMensField.getText();
+        String gastosMensualesStr = gastosMensualesField.getText();
+        int edad = (Integer) edadSpinner.getValue();
+        boolean tieneDeuda = tieneDeudaCheck.isSelected();
 
-
-        if(nombre.isEmpty() || rut.isEmpty() || domicilio.isEmpty()){
+        if(nombre.isEmpty() || rut.isEmpty() || domicilio.isEmpty() || ingresoMensualStr.isEmpty() || gastosMensualesStr.isEmpty() || edad <= 0) {
             JOptionPane.showMessageDialog(this,
                     "Todos los campos son obligatorios.",
                     "Crear Cliente",
@@ -131,7 +139,10 @@ public class CrearCliente extends JDialog {
 
         try {
             // --- 1. INTENTO DE CREACIÓN ---
-            ControladorSistema.getInstancia().crearCliente(nombre, rut, domicilio);
+            ControladorSistema.getInstancia().crearCliente(nombre, rut, domicilio, edad,
+                    Double.parseDouble(ingresoMensualStr),
+                    Double.parseDouble(gastosMensualesStr),
+                    tieneDeuda);
 
             // --- 2. BLOQUE DE ÉXITO (Se cierra la ventana) ---
             JOptionPane.showMessageDialog(this,
@@ -140,6 +151,8 @@ public class CrearCliente extends JDialog {
                     JOptionPane.INFORMATION_MESSAGE);
 
             createAndShowGUI(rut);
+
+            mostrarResultadoRiesgoGUI(ControladorSistema.getInstancia().analizarSolicitud(rut));
 
             // CERRAR LA VENTANA SOLO SI LA CREACIÓN FUE EXITOSA
             dispose();
@@ -267,4 +280,71 @@ public class CrearCliente extends JDialog {
         });
     }
 
+    // Método para mostrar la interpretación del riesgo
+    public void mostrarResultadoRiesgoGUI(double valorRiesgo) {
+
+        // 1. Lógica de Interpretación: Definimos el texto y el tipo de alerta
+        String mensaje;
+        String tituloVentana;
+        int tipoIcono; // Para que salga una X roja, un triángulo amarillo o una i azul
+
+        if (valorRiesgo == -1.0) {
+            tituloVentana = "SOLICITUD BLOQUEADA";
+            mensaje = "ESTADO: RECHAZADO AUTOMÁTICAMENTE\n\n" +
+                    "Motivo: El cliente presenta antecedentes comerciales negativos (Deuda Castigada/DICOM).\n" +
+                    "No es posible cursar la evaluación financiera.";
+            tipoIcono = JOptionPane.ERROR_MESSAGE;
+        } else if (valorRiesgo > 60) {
+            // CASO RIESGO ALTO
+            tituloVentana = "ALERTA DE RIESGO";
+            mensaje = String.format("NIVEL DE RIESGO: ALTO (%.2f%%)\n\n" +
+                    "El cliente supera el umbral de seguridad.\n" +
+                    "RECOMENDACIÓN: Rechazar solicitud de crédito.\n" +
+                    "Sus deudas consumen gran parte de sus ingresos.", valorRiesgo);
+            tipoIcono = JOptionPane.ERROR_MESSAGE; // Icono Rojo
+        }
+
+        else if (valorRiesgo > 40) {
+            // CASO RIESGO MEDIO
+            tituloVentana = "Análisis de Riesgo";
+            mensaje = String.format("NIVEL DE RIESGO: MEDIO (%.2f%%)\n\n" +
+                    "El cliente tiene capacidad de pago ajustada.\n" +
+                    "RECOMENDACIÓN: Aprobar con condiciones (Aval o monto bajo).", valorRiesgo);
+            tipoIcono = JOptionPane.WARNING_MESSAGE; // Icono Amarillo
+
+        } else {
+            // CASO RIESGO BAJO
+            tituloVentana = "Análisis de Riesgo";
+            mensaje = String.format("NIVEL DE RIESGO: BAJO (%.2f%%)\n\n" +
+                    "El cliente tiene excelente salud financiera.\n" +
+                    "RECOMENDACIÓN: Aprobar solicitud inmediatamente.", valorRiesgo);
+            tipoIcono = JOptionPane.INFORMATION_MESSAGE; // Icono Azul
+        }
+
+        // 2. Construcción de la GUI (Tu estructura adaptada)
+        JTextArea textArea = new JTextArea(6, 35); // Tamaño ajustado
+        textArea.setText(mensaje);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFont(new Font("SansSerif", Font.PLAIN, 14)); // Letra un poco más grande
+
+        // Un margen interno para que el texto no pegue con los bordes
+        textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+        // 3. Creación del Dialog
+        // Pasamos 'tipoIcono' para que visualmente se entienda la gravedad
+        JOptionPane optionPane = new JOptionPane(panel, tipoIcono);
+
+        // NOTA: Si este método está dentro de un JFrame, usa 'this'. Si es estático, usa 'null'.
+        JDialog dialog = optionPane.createDialog(null, tituloVentana);
+
+        dialog.setModal(true);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+        dialog.dispose();
+    }
 }

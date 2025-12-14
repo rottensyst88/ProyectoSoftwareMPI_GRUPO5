@@ -15,14 +15,42 @@ public class Cliente implements Serializable {
     private ArrayList<Cuenta> cuentas;
     private String clavePersonal;
 
-    public Cliente(String nombreCompleto, String rut, String domicilio) {
+    private int edad;
+    private double ingresosMensuales;
+    private double gastosMensuales;
+    private boolean tieneDeudaCastigada;
+
+    private double ratioEndeudamiento;
+
+    public Cliente(String nombreCompleto, String rut, String domicilio, int edad, double ingresos, double gastos, boolean castigada) {
         this.rut = rut;
         this.domicilio = domicilio;
         this.nombreCompleto = nombreCompleto;
         this.contratos = new ArrayList<>();
         this.cuentas = new ArrayList<>();
         this.clavePersonal = getRandomString();
+
+        this.edad = edad;
+        this.ingresosMensuales = ingresos;
+        this.gastosMensuales = gastos;
+        this.tieneDeudaCastigada = castigada;
     }
+
+    public void setRatioEndeudamiento(double ratioEndeudamiento) {
+        this.ratioEndeudamiento = ratioEndeudamiento;
+    }
+
+    public double getRatioEndeudamiento() {
+        return ratioEndeudamiento;
+    }
+
+    public int getEdad() { return edad; }
+
+    public double getIngresosMensuales() { return ingresosMensuales; }
+
+    public double getGastosMensuales() { return gastosMensuales; }
+
+    public boolean isTieneDeudaCastigada() { return tieneDeudaCastigada; }
 
     public String getClavePersonal() {
         return clavePersonal;

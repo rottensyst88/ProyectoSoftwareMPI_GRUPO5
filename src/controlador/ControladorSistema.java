@@ -29,7 +29,7 @@ public class ControladorSistema implements Serializable {
     // Se inician metodos del sistema!
     ArrayList<Cliente> clientes = new ArrayList<>();
 
-    public void crearCliente(String nombre, String rut, String domicilio) throws BancoException {
+    public void crearCliente(String nombre, String rut, String domicilio, int edad, double ingreso, double gasto, boolean castigado) throws BancoException {
 
         Rut rutObjeto = Rut.of(rut);
 
@@ -44,7 +44,7 @@ public class ControladorSistema implements Serializable {
             throw new BancoException("Cliente ya existe");
         }
 
-        Cliente cliente = new Cliente(nombre, rut, domicilio);
+        Cliente cliente = new Cliente(nombre, rut, domicilio, edad, ingreso, gasto, castigado);
         clientes.add(cliente);
 
     }
@@ -119,6 +119,61 @@ public class ControladorSistema implements Serializable {
         }
 
         return contratoEncontrado;
+    }
+
+    public double analizarSolicitud(String x) throws BancoException {
+        Optional<Cliente> clienteOpt = findCliente(x);
+
+        if (clienteOpt.isEmpty()) {
+            throw new BancoException("Cliente no encontrado");
+        }
+
+        Cliente cliente = clienteOpt.get();
+
+        System.out.println("\n--- REPORTE DE RIESGO BANCARIO ---");
+        System.out.println("Cliente: " + cliente.getNombreCompleto());
+
+        // REGLA 1: Bloqueo inmediato por historial negativo
+        if (cliente.isTieneDeudaCastigada()) {
+            System.out.println("[RESULTADO]: RECHAZADO AUTOMÁTICAMENTE");
+            System.out.println("Motivo: El cliente presenta deuda castigada (Historial negativo).");
+            return -1;
+        }
+
+        // REGLA 2: Validación de edad mínima
+        if (cliente.getEdad() < 18) {
+            System.out.println("[RESULTADO]: RECHAZADO");
+            System.out.println("Motivo: El cliente es menor de edad.");
+            return -1;
+        }
+
+        // REGLA 3: Cálculo de Capacidad de Endeudamiento (Ratio)
+        if (cliente.getIngresosMensuales() <= 0) {
+            System.out.println("[RESULTADO]: RECHAZADO");
+            System.out.println("Motivo: No se registran ingresos válidos.");
+            return -1;
+        }
+
+        double ratioEndeudamiento = (cliente.getGastosMensuales() / cliente.getIngresosMensuales()) * 100;
+
+        System.out.printf("Ratio de Endeudamiento actual: %.2f%%\n", ratioEndeudamiento);
+
+        // Determinación del puntaje y decisión
+        if (ratioEndeudamiento > 60) {
+            System.out.println("Nivel de Riesgo: ALTO");
+            System.out.println("[RESULTADO]: RECHAZADO");
+            System.out.println("Motivo: Sus gastos superan el 60% de sus ingresos. Capacidad de pago crítica.");
+        } else if (ratioEndeudamiento > 40) {
+            System.out.println("Nivel de Riesgo: MEDIO");
+            System.out.println("[RESULTADO]: APROBADO CON OBSERVACIONES");
+            System.out.println("Nota: Se aprueba una línea de crédito baja. Se recomienda aval.");
+        } else {
+            System.out.println("Nivel de Riesgo: BAJO");
+            System.out.println("[RESULTADO]: APROBADO");
+            System.out.println("Nota: Cliente ideal. Se ofrece línea de crédito premium.");
+        }
+
+        return ratioEndeudamiento;
     }
 
     public String[][] listarClientes() {
