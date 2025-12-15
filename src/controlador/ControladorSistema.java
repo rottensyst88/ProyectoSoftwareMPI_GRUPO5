@@ -4,7 +4,8 @@ import modelo.Cliente;
 import excepcion.BancoException;
 import modelo.Contrato;
 import modelo.Cuenta;
-import modelo.tarjetas.Tarjeta;
+import modelo.Rut;
+import modelo.Tarjeta;
 import persistencia.IOPersistencia;
 
 import java.io.Serializable;
@@ -28,13 +29,22 @@ public class ControladorSistema implements Serializable {
     // Se inician metodos del sistema!
     ArrayList<Cliente> clientes = new ArrayList<>();
 
-    public void crearCliente(String nombre, String rut, String domicilio) throws BancoException {
+    public void crearCliente(String nombre, String rut, String domicilio, int edad, double ingreso, double gasto, boolean castigado) throws BancoException {
 
-        if (findCliente(rut).isPresent()) {
+        Rut rutObjeto = Rut.of(rut);
+
+        if (rutObjeto == null) {
+            // Si el formato es inválido, lanzamos una excepción.
+            // La vista capturará esta excepción y mostrará el error.
+            throw new BancoException("El formato del RUT ingresado es incorrecto o inválido. Use el formato XX.XXX.XXX-X.");
+        }
+
+
+        if (findCliente(rut).isPresent() || findClientePorNombre(nombre).isPresent()) {
             throw new BancoException("Cliente ya existe");
         }
 
-        Cliente cliente = new Cliente(nombre, rut, domicilio);
+        Cliente cliente = new Cliente(nombre, rut, domicilio, edad, ingreso, gasto, castigado);
         clientes.add(cliente);
 
     }
@@ -47,10 +57,9 @@ public class ControladorSistema implements Serializable {
 
             Contrato contrato = new Contrato(tipoCuenta);
 
-            /*
-            if (cliente.get().getContratos().contains(contrato)) {
-                throw new BancoException("El contrato ya existe para este cliente");
-            }*/
+            if (tipoCuenta.equalsIgnoreCase("LINEA CREDITO") && cliente.get().getRatioEndeudamiento() == -1) {
+                throw new BancoException("No se puede generar contrato de línea de crédito para clientes rechazados");
+            }
 
             try{
                 cliente.get().agregarContrato(contrato);
@@ -85,7 +94,7 @@ public class ControladorSistema implements Serializable {
                     contrato.firmarContrato();
                     contratoEncontrado = true;
 
-                    if (tipoCuenta.equals("CUENTA CORRIENTE") || tipoCuenta.equals("CUENTA RUT") || tipoCuenta.equals("CUENTA AHORRO")){
+                    if (tipoCuenta.equals("CUENTA CORRIENTE") || tipoCuenta.equals("CUENTA RUT") || tipoCuenta.equals("CUENTA AHORRO") || tipoCuenta.equals("LINEA CREDITO")) {
                         Cuenta cuenta = new Cuenta(tipoCuenta);
 
                         cliente.get().agregarCuenta(cuenta);
@@ -109,6 +118,66 @@ public class ControladorSistema implements Serializable {
         }
 
         return contratoEncontrado;
+    }
+
+    public double analizarSolicitud(String x) throws BancoException {
+        Optional<Cliente> clienteOpt = findCliente(x);
+
+        if (clienteOpt.isEmpty()) {
+            throw new BancoException("Cliente no encontrado");
+        }
+
+        Cliente cliente = clienteOpt.get();
+
+        System.out.println("\n--- REPORTE DE RIESGO BANCARIO ---");
+        System.out.println("Cliente: " + cliente.getNombreCompleto());
+
+        // REGLA 1: Bloqueo inmediato por historial negativo
+        if (cliente.isTieneDeudaCastigada()) {
+            System.out.println("[RESULTADO]: RECHAZADO AUTOMÁTICAMENTE");
+            System.out.println("Motivo: El cliente presenta deuda castigada (Historial negativo).");
+            cliente.setRatioEndeudamiento(-1);
+            return -1;
+        }
+
+        // REGLA 2: Validación de edad mínima
+        if (cliente.getEdad() < 18) {
+            System.out.println("[RESULTADO]: RECHAZADO");
+            System.out.println("Motivo: El cliente es menor de edad.");
+            cliente.setRatioEndeudamiento(-1);
+            return -1;
+        }
+
+        // REGLA 3: Cálculo de Capacidad de Endeudamiento (Ratio)
+        if (cliente.getIngresosMensuales() <= 0) {
+            System.out.println("[RESULTADO]: RECHAZADO");
+            System.out.println("Motivo: No se registran ingresos válidos.");
+            cliente.setRatioEndeudamiento(-1);
+            return -1;
+        }
+
+        double ratioEndeudamiento = (cliente.getGastosMensuales() / cliente.getIngresosMensuales()) * 100;
+
+        System.out.printf("Ratio de Endeudamiento actual: %.2f%%\n", ratioEndeudamiento);
+
+        // Determinación del puntaje y decisión
+        if (ratioEndeudamiento > 60) {
+            System.out.println("Nivel de Riesgo: ALTO");
+            System.out.println("[RESULTADO]: RECHAZADO");
+            System.out.println("Motivo: Sus gastos superan el 60% de sus ingresos. Capacidad de pago crítica.");
+            cliente.setRatioEndeudamiento(-1);
+        } else if (ratioEndeudamiento > 40) {
+            System.out.println("Nivel de Riesgo: MEDIO");
+            System.out.println("[RESULTADO]: APROBADO CON OBSERVACIONES");
+            System.out.println("Nota: Se aprueba una línea de crédito baja. Se recomienda aval.");
+        } else {
+            System.out.println("Nivel de Riesgo: BAJO");
+            System.out.println("[RESULTADO]: APROBADO");
+            System.out.println("Nota: Cliente ideal. Se ofrece línea de crédito premium.");
+        }
+
+        cliente.setRatioEndeudamiento(ratioEndeudamiento);
+        return ratioEndeudamiento;
     }
 
     public String[][] listarClientes() {
@@ -174,17 +243,6 @@ public class ControladorSistema implements Serializable {
 
         return cliente.get().getClavePersonal();
     }
-
-    public boolean verificarClaveCliente(String rutCliente, String clave) throws BancoException {
-        Optional<Cliente> cliente = findCliente(rutCliente);
-
-        if (cliente.isEmpty()) {
-            throw new BancoException("Cliente no encontrado");
-        }
-
-        return cliente.get().getClavePersonal().equals(clave);
-    }
-
     // UTILIDADES
 
     private Optional<Cliente> findCliente(String rut){
@@ -196,6 +254,25 @@ public class ControladorSistema implements Serializable {
         }
         return Optional.empty();
     }
+
+    public Optional<Cliente> findClientePorNombre(String nombre) {
+
+        // Iteramos sobre todos los clientes en la lista 'clientes'
+        for (Cliente c : clientes) {
+
+            // Comparamos el nombre del cliente con el nombre buscado.
+            // Usamos equalsIgnoreCase() para ignorar mayúsculas y minúsculas
+            // al comparar los nombres (ej. "Juan" es igual a "juan").
+            if (c.getNombreCompleto().equalsIgnoreCase(nombre)) {
+                // Si encontramos una coincidencia, devolvemos un Optional que contiene el cliente.
+                return Optional.of(c);
+            }
+        }
+
+        // Si el bucle termina sin encontrar coincidencias, devolvemos un Optional vacío.
+        return Optional.empty();
+    }
+
 
     public void saveControlador() throws BancoException {
         try{
