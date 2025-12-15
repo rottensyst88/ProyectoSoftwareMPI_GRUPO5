@@ -81,7 +81,7 @@ public class Cliente implements Serializable {
             }
         }
 
-        if (contratos.size() > 2) {
+        if (contratos.size() > 3) {
             throw new BancoException("El cliente no puede tener más de 3 contratos");
         }
 

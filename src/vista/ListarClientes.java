@@ -125,8 +125,9 @@ public class ListarClientes extends JDialog {
         }
 
         ListarClientes dialog = new ListarClientes();
-        dialog.pack();
-        dialog.setLocationRelativeTo(null); // Centrar en pantalla
+        dialog.setSize(1000,800);
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
 }
