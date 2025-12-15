@@ -1,4 +1,4 @@
-package modelo.tarjetas;
+package modelo;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -32,10 +32,6 @@ public class Tarjeta implements Serializable {
 
     public String getNumeroTarjeta() {
         return numeroTarjeta;
-    }
-
-    public String getTitular() {
-        return titular;
     }
 
     public String getFechaExpiracion() {
